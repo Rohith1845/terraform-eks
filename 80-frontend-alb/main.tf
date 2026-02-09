@@ -1,0 +1,52 @@
+resource "aws_lb" "ingress_alb" {
+    name               = "${local.common_name_suffix}-ingress-alb"
+    internal           = true
+    load_balancer_type = "application"
+    security_groups    = [local.ingress_alb_sg_id]
+    subnets            = [local.public_subnet_ids]
+    
+
+    enable_deletion_protection = false #prevention of accidental deletion
+
+    tags = merge(
+        local.common_tags,{
+            Name = "${local.common_name_suffix}-ingress-alb"
+        }
+    )
+}
+
+resource "aws_lb_listener" "ingress_alb" {
+  load_balancer_arn = aws_lb.ingress_alb.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-3-2021-06"
+  certificate_arn   = local.ingress_alb_certificate_arn
+
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/html"
+      message_body = "<h1>Hi iam from ingress alb</h1>"
+      status_code = "200"
+    }
+  }
+
+#   default_action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.front_end.arn
+#   }
+}
+
+resource "aws_route53_record" "ingress_alb" {
+    zone_id = var.zone_id
+    name = "*.${var.domain_name}"
+    type = "A"
+    allow_overwrite = true
+
+    alias {
+      # These are ALB details not domain details
+      name = aws_lb.ingress_alb.dns_name
+      zone_id = aws_lb.ingress_alb.zone_id
+      evaluate_target_health = true
+    }
+}
