@@ -75,11 +75,11 @@ pipeline {
                 }
             }
         }
-        stage('Parallel Trigger'){
-            Parallel{
-                stage('Bastion'){
-                    steps{
-                        script{
+        stage('Parallel Trigger') {
+            Parallel {
+                stage('Bastion') {
+                    steps {
+                        script {
                             build job: '20-bastion',
                                 wait: false, // wait for completion
                                 propagate: false //propagate status
@@ -87,9 +87,9 @@ pipeline {
                         }
                     }
                 }
-                stage('SG Rules'){
-                    steps{
-                        script{
+                stage('SG Rules') {
+                    steps {
+                        script {
                             build job: '30-sg-rules',
                                 wait: false,
                                 propagate: false
@@ -97,9 +97,9 @@ pipeline {
                         }
                     }
                 }
-                stage('ECR'){
-                    steps{
-                        script{
+                stage('ECR') {
+                    steps {
+                        script {
                             build job: '40-ecr',
                                 wait: false,
                                 propagate: false
@@ -107,9 +107,9 @@ pipeline {
                         }
                     }
                 }
-                stage('ACM'){
-                    steps{
-                        script{
+                stage('ACM') {
+                    steps {
+                        script {
                             build job: '70-acm',
                                 wait: true,
                                 propagate: false
@@ -117,9 +117,9 @@ pipeline {
                         }
                     }
                 }
-                stage('EKS'){
-                    steps{
-                        script{
+                stage('EKS') {
+                    steps {
+                        script {
                             build job: '90-EKS',
                                 wait: false,
                                 propagate: false
@@ -127,9 +127,9 @@ pipeline {
                         }
                     }
                 }
-                stage('ALB'){
-                    steps{
-                        script{
+                stage('ALB') {
+                    steps {
+                        script {
                             build job: '80-frontend-alb',
                                 wait: false,
                                 propagate: false
