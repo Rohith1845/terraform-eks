@@ -7,7 +7,7 @@ terraform {
   }
 #  Storing state file in remote location
   backend "s3" {
-    bucket = "roboshop-dev-infra"
+    bucket = "roboshop-rohith"
     key    = "roboshop-eks-acm"
     region = "us-east-1"
     use_lockfile = true
