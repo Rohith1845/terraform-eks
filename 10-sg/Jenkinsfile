@@ -76,7 +76,7 @@ pipeline {
             }
         }
         stage('Parallel Trigger') {
-            Parallel {
+            parallel {
                 stage('Bastion') {
                     steps {
                         script {
