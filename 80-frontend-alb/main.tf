@@ -3,7 +3,7 @@ resource "aws_lb" "ingress_alb" {
     internal           = true
     load_balancer_type = "application"
     security_groups    = [local.ingress_alb_sg_id]
-    subnets            = [local.public_subnet_ids]
+    subnets            = local.public_subnet_ids
     
 
     enable_deletion_protection = false #prevention of accidental deletion
