@@ -65,6 +65,11 @@ pipeline {
                     }
                 }
             }
+            stage('Terraform Destroy') {
+            steps {
+                sh 'terraform destroy -auto-approve'
+            }
+        }
         }
         // stage('Trigger SG'){
         //     steps {
