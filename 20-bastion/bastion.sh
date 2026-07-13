@@ -25,7 +25,8 @@ systemctl enable docker
 usermod -aG docker ec2-user
 
 # kubectl
-curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.34.2/2025-11-13/bin/linux/amd64/kubectl
+K8S_VERSION="1.35.3"
+curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/${K8S_VERSION}/2026-04-08/bin/linux/amd64/kubectl
 chmod +x ./kubectl
 mkdir -p $HOME/bin && cp ./kubectl  $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH
 
