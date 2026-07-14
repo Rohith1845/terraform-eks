@@ -120,7 +120,7 @@ pipeline {
                 stage('EKS') {
                     steps {
                         script {
-                            build job: 'roboshop-infra/90-EKS',
+                            build job: '../90-EKS',
                                 wait: false,
                                 propagate: false
                             
