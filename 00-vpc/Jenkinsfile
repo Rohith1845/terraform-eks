@@ -70,7 +70,7 @@ pipeline {
         stage('Trigger SG'){
             steps {
                 script {
-                    build job: 'roboshop-infra/10-sg',
+                    build job: '../10-sg',
                         wait: false,
                         propagate: false
                 }
