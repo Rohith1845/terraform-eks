@@ -3,112 +3,40 @@ pipeline {
 
     environment {
         AWS_REGION = "us-east-1"
-        REPO_URL   = "https://github.com/Rohith1845/terraform-eks.git"
+        REPO_URL   = "https://github.com/Rohith1845/roboshop_dev_infra.git"
     }
 
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                    credentialsId: 'github-token',
+                    credentialsId: 'github-creds',
                     url: "${REPO_URL}"
             }
         }
 
         stage('Approval') {
             steps {
-                input message: '''⚠️ WARNING: This will destroy ALL infrastructure!
-                
-90-eks → 80-frontend-alb → 70-acm → 40-ecr → 30-sg-rules → 20-bastion → 10-sg → 00-vpc
-
-Are you absolutely sure?''',
+                input message: '''⚠️ WARNING: Destroys ALL infra!
+90-eks → 80-alb → 70-acm → 40-ecr → 30-sg-rules → 20-bastion → 10-sg → 00-vpc''',
                       ok: 'YES DESTROY EVERYTHING'
             }
         }
 
-        stage('Destroy 90-eks') {
+        stage('Destroy All') {
             steps {
-                dir('90-eks') {
+                withAWS(region: 'us-east-1', credentials: 'aws-creds') {
                     sh '''
-                        terraform init
-                        terraform destroy -auto-approve
-                    '''
-                }
-            }
-        }
-
-        stage('Destroy 80-frontend-alb') {
-            steps {
-                dir('80-frontend-alb') {
-                    sh '''
-                        terraform init
-                        terraform destroy -auto-approve
-                    '''
-                }
-            }
-        }
-
-        stage('Destroy 70-acm') {
-            steps {
-                dir('70-acm') {
-                    sh '''
-                        terraform init
-                        terraform destroy -auto-approve
-                    '''
-                }
-            }
-        }
-
-        stage('Destroy 40-ecr') {
-            steps {
-                dir('40-ecr') {
-                    sh '''
-                        terraform init
-                        terraform destroy -auto-approve
-                    '''
-                }
-            }
-        }
-
-        stage('Destroy 30-sg-rules') {
-            steps {
-                dir('30-sg-rules') {
-                    sh '''
-                        terraform init
-                        terraform destroy -auto-approve
-                    '''
-                }
-            }
-        }
-
-        stage('Destroy 20-bastion') {
-            steps {
-                dir('20-bastion') {
-                    sh '''
-                        terraform init
-                        terraform destroy -auto-approve
-                    '''
-                }
-            }
-        }
-
-        stage('Destroy 10-sg') {
-            steps {
-                dir('10-sg') {
-                    sh '''
-                        terraform init
-                        terraform destroy -auto-approve
-                    '''
-                }
-            }
-        }
-
-        stage('Destroy 00-vpc') {
-            steps {
-                dir('00-vpc') {
-                    sh '''
-                        terraform init
-                        terraform destroy -auto-approve
+                        for MODULE in 90-eks 80-frontend-alb 70-acm 40-ecr 30-sg-rules 20-bastion 10-sg 00-vpc
+                        do
+                            echo "=========================================="
+                            echo "Destroying $MODULE ..."
+                            echo "=========================================="
+                            cd $MODULE
+                            terraform init
+                            terraform destroy -auto-approve
+                            cd ..
+                        done
                     '''
                 }
             }
@@ -120,7 +48,7 @@ Are you absolutely sure?''',
             echo '✅ All infrastructure destroyed successfully'
         }
         failure {
-            echo '❌ Destroy failed at above stage — fix and rerun from that stage'
+            echo '❌ Destroy failed — check which module failed above in logs'
         }
     }
 }
