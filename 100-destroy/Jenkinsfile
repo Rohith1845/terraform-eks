@@ -3,14 +3,14 @@ pipeline {
 
     environment {
         AWS_REGION = "us-east-1"
-        REPO_URL   = "https://github.com/Rohith1845/roboshop_dev_infra.git"
+        REPO_URL   = "https://github.com/Rohith1845/terraform-eks.git"
     }
 
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                    credentialsId: 'github-creds',
+                    credentialsId: 'github-token',
                     url: "${REPO_URL}"
             }
         }
