@@ -1,0 +1,126 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = "us-east-1"
+        REPO_URL   = "https://github.com/Rohith1845/roboshop_dev_infra.git"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    credentialsId: 'github-creds',
+                    url: "${REPO_URL}"
+            }
+        }
+
+        stage('Approval') {
+            steps {
+                input message: '''⚠️ WARNING: This will destroy ALL infrastructure!
+                
+90-eks → 80-frontend-alb → 70-acm → 40-ecr → 30-sg-rules → 20-bastion → 10-sg → 00-vpc
+
+Are you absolutely sure?''',
+                      ok: 'YES DESTROY EVERYTHING'
+            }
+        }
+
+        stage('Destroy 90-eks') {
+            steps {
+                dir('90-eks') {
+                    sh '''
+                        terraform init
+                        terraform destroy -auto-approve
+                    '''
+                }
+            }
+        }
+
+        stage('Destroy 80-frontend-alb') {
+            steps {
+                dir('80-frontend-alb') {
+                    sh '''
+                        terraform init
+                        terraform destroy -auto-approve
+                    '''
+                }
+            }
+        }
+
+        stage('Destroy 70-acm') {
+            steps {
+                dir('70-acm') {
+                    sh '''
+                        terraform init
+                        terraform destroy -auto-approve
+                    '''
+                }
+            }
+        }
+
+        stage('Destroy 40-ecr') {
+            steps {
+                dir('40-ecr') {
+                    sh '''
+                        terraform init
+                        terraform destroy -auto-approve
+                    '''
+                }
+            }
+        }
+
+        stage('Destroy 30-sg-rules') {
+            steps {
+                dir('30-sg-rules') {
+                    sh '''
+                        terraform init
+                        terraform destroy -auto-approve
+                    '''
+                }
+            }
+        }
+
+        stage('Destroy 20-bastion') {
+            steps {
+                dir('20-bastion') {
+                    sh '''
+                        terraform init
+                        terraform destroy -auto-approve
+                    '''
+                }
+            }
+        }
+
+        stage('Destroy 10-sg') {
+            steps {
+                dir('10-sg') {
+                    sh '''
+                        terraform init
+                        terraform destroy -auto-approve
+                    '''
+                }
+            }
+        }
+
+        stage('Destroy 00-vpc') {
+            steps {
+                dir('00-vpc') {
+                    sh '''
+                        terraform init
+                        terraform destroy -auto-approve
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ All infrastructure destroyed successfully'
+        }
+        failure {
+            echo '❌ Destroy failed at above stage — fix and rerun from that stage'
+        }
+    }
+}
